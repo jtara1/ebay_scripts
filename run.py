@@ -1,6 +1,6 @@
-from ebay_test.get_items_info import trading, get_user
+from ebay_scripts.get_my_ebay_selling import get_my_ebay_selling
 
 
 if __name__ == '__main__':
     # get_user()
-    trading()
+    get_my_ebay_selling()
