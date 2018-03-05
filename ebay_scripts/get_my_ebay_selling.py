@@ -1,42 +1,68 @@
+# std library
 import datetime
-# import click
 import json
-import os
+from pprint import pprint, pformat
+
+# installed modules
 from ebaysdk.trading import Connection as Trading
 from ebaysdk.response import ResponseDataObject
-EBAY_API = os.path.abspath('/home/j/Documents/ebay.yaml')
-JSON_ACCEPTED_TYPES = (int, float, str, dict, list, bool, type(None))
+import click
+
+# local module
+from ebay_scripts import EBAY_API, JSON_ACCEPTED_TYPES
 
 
 def convert_to_dict(rdo_list):
+    """Convert a list of objects of type
+    :class:`ebaysdk.response.ResponseDataObject` to a list of dictionaries
+
+    :returns: list of dictionaries with the same data defined as attributes \n
+        each of the :class:`ebaysdk.response.ResponseDataObject` objects
+    """
     def convert_rdo(rdo):
+        """Convert a :class:`ebaysdk.response.ResponseDataObject` to dict"""
+        # the only attributes it has describes the data
         rdo_dict = rdo.__dict__
-        for key in rdo_dict.keys():
-            if isinstance(rdo_dict[key], ResponseDataObject):
-                value_dict = convert_rdo(rdo_dict[key])
+        for key, value in rdo_dict.items():
+            # value is of type ResponseDataObject
+            if isinstance(value, ResponseDataObject):
+                value_dict = convert_rdo(value)
                 rdo_dict[key] = value_dict
-            elif isinstance(rdo_dict[key], datetime.datetime):
-                rdo_dict[key] = str(rdo_dict[key])
-            elif not isinstance(rdo_dict[key], JSON_ACCEPTED_TYPES):
+
+            # value is of type datetime.datetime
+            elif isinstance(value, datetime.datetime):
+                rdo_dict[key] = str(value)
+
+            # value is another type that isn't JSON serializable
+            elif not isinstance(value, JSON_ACCEPTED_TYPES):
                 raise Exception('{} is unaccepted type for converting to dict'
-                                ' for JSON'.format(type(rdo_dict[key])))
+                                ' for JSON'.format(type(value)))
         return rdo_dict
 
-    converted_list = []
-    for rdo in rdo_list:
-        converted_list.append(convert_rdo(rdo))
-    return converted_list
+    return [convert_rdo(rdo) for rdo in rdo_list]
 
 
-def get_my_ebay_selling():
+@click.command()
+@click.option('--output', '-o',
+              type=click.STRING, default='eBay Active Selling Items Info.json')
+def get_my_ebay_selling(output):
+    """Get info on active selling items from ebay. Print results and serialize
+    in file path, output, as JSON
+
+    :param output: the file path which contains the items info, JSON formatted
+    """
     api = Trading(config_file=EBAY_API)
-    response = api.execute('GetMyeBaySelling', {'ActiveList': {'Include': True}})
+    response = api.execute(
+        'GetMyeBaySelling',
+        {'ActiveList': {'Include': True}})
 
     active_list = response.reply.ActiveList
     print(active_list.PaginationResult)
 
     items_list = convert_to_dict(active_list.ItemArray.Item)
-    json.dump(items_list, open('out.json', 'w'))
+    json.dump(items_list, open(output, 'w'))
+
+    pprint(items_list)
 
 
 if __name__ == '__main__':
