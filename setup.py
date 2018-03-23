@@ -101,6 +101,7 @@ except (FileNotFoundError, FileExistsError):
 
 update_cfg_module_name()
 
+module_name = module_name.replace('-', '_')
 setup(use_scm_version={'root': directory},
       setup_requires=['setuptools_scm'],
       name=module_name,
@@ -115,7 +116,11 @@ setup(use_scm_version={'root': directory},
       entry_points={
           'console_scripts':
               ['GetMyeBaySelling={}.get_my_ebay_selling:get_my_ebay_selling'
-               .format(module_name.replace('-', '_'))]},
+               .format(module_name),
+               'GetUser={}.get_user:get_user'
+               .format(module_name)
+               ]
+      },
       install_requires=get_install_requirements(),
       # list of strs https://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[]

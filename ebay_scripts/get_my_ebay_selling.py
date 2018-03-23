@@ -1,45 +1,14 @@
 # std library
-import datetime
 import json
-from pprint import pprint, pformat
+from pprint import pprint
 
 # installed modules
 from ebaysdk.trading import Connection as Trading
-from ebaysdk.response import ResponseDataObject
 import click
 
 # local module
-from ebay_scripts import EBAY_API, JSON_ACCEPTED_TYPES
-
-
-def convert_to_dict(rdo_list):
-    """Convert a list of objects of type
-    :class:`ebaysdk.response.ResponseDataObject` to a list of dictionaries
-
-    :returns: list of dictionaries with the same data defined as attributes \n
-        each of the :class:`ebaysdk.response.ResponseDataObject` objects
-    """
-    def convert_rdo(rdo):
-        """Convert a :class:`ebaysdk.response.ResponseDataObject` to dict"""
-        # the only attributes it has describes the data
-        rdo_dict = rdo.__dict__
-        for key, value in rdo_dict.items():
-            # value is of type ResponseDataObject
-            if isinstance(value, ResponseDataObject):
-                value_dict = convert_rdo(value)
-                rdo_dict[key] = value_dict
-
-            # value is of type datetime.datetime
-            elif isinstance(value, datetime.datetime):
-                rdo_dict[key] = str(value)
-
-            # value is another type that isn't JSON serializable
-            elif not isinstance(value, JSON_ACCEPTED_TYPES):
-                raise Exception('{} is unaccepted type for converting to dict'
-                                ' for JSON'.format(type(value)))
-        return rdo_dict
-
-    return [convert_rdo(rdo) for rdo in rdo_list]
+from ebay_scripts import EBAY_API
+from ebay_scripts.utility import convert_rdo_list_to_dict
 
 
 @click.command()
@@ -59,7 +28,7 @@ def get_my_ebay_selling(output):
     active_list = response.reply.ActiveList
     print(active_list.PaginationResult)
 
-    items_list = convert_to_dict(active_list.ItemArray.Item)
+    items_list = convert_rdo_list_to_dict(active_list.ItemArray.Item)
     json.dump(items_list, open(output, 'w'))
 
     pprint(items_list)
