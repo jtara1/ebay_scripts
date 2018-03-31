@@ -1,2 +1,3 @@
 ebaysdk
 click
+git+https://github.com/jtara1/jtara1_util

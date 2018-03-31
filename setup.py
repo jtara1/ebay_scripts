@@ -118,7 +118,9 @@ setup(use_scm_version={'root': directory},
               ['GetMyeBaySelling={}.get_my_ebay_selling:get_my_ebay_selling'
                .format(module_name),
                'GetUser={}.get_user:get_user'
-               .format(module_name)
+               .format(module_name),
+               'ReviseInventoryStatus={}.revise_inventory_status:cli_wrapper'
+               .format(module_name),
                ]
       },
       install_requires=get_install_requirements(),
