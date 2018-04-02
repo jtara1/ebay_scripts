@@ -7,7 +7,7 @@ from ebaysdk.trading import Connection as Trading
 import click
 
 # local module
-from ebay_scripts import EBAY_API, LOGGER
+from ebay_scripts import EBAY_API
 from ebay_scripts.utility import convert_rdo_to_dict
 from ebay_scripts.exception import EbayScriptsException
 
@@ -41,7 +41,7 @@ def revise_inventory_status(item_id, price=None, quantity=None, sku=None):
 
     pretty_reply = pformat(convert_rdo_to_dict(response.reply))
     print(pretty_reply)
-    LOGGER.info(pretty_reply)
+    # LOGGER.info(pretty_reply)
 
     return response
 
