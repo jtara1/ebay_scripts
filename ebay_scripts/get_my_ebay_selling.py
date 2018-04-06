@@ -29,9 +29,9 @@ def get_my_ebay_selling(output):
     print(active_list.PaginationResult)
 
     items_list = convert_rdo_list_to_dict(active_list.ItemArray.Item)
-    json.dump(items_list, open(output, 'w'))
-
     pprint(items_list)
+
+    json.dump(items_list, open(output, 'w'))
 
 
 if __name__ == '__main__':

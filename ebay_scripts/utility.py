@@ -24,6 +24,11 @@ def convert_rdo_to_dict(rdo):
             value_dict = convert_rdo_to_dict(value)
             rdo_dict[key] = value_dict
 
+        # if at least one item is a ResponseDataObject in this list, convert
+        # all items in the list to JSON serializeable type
+        elif isinstance(value, list) and list_contains_rdo(value):
+            rdo_dict[key] = convert_rdo_list_to_dict(value)
+
         # value is of type datetime.datetime
         elif isinstance(value, datetime.datetime):
             rdo_dict[key] = str(value)
@@ -33,3 +38,7 @@ def convert_rdo_to_dict(rdo):
             raise Exception('{} is unaccepted type for converting to dict'
                             ' for JSON'.format(type(value)))
     return rdo_dict
+
+
+def list_contains_rdo(sequence):
+    return any([isinstance(value, ResponseDataObject) for value in sequence])
